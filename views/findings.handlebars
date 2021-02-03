@@ -1,0 +1,43 @@
+<center>
+    <h1>Findings</h1>
+</center>
+
+<hr>
+
+<table class="table">
+    <thead class="thead-light">
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Original Text</th>
+            <th scope="col">Detected Field</th>
+            <th scope="col">Confidence Score</th>
+            <th scope="col">Masking Text</th>
+            <th scope="col">String location</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        {{#each filteredData}}
+        <tr>
+            <th scope="row">{{@index}}</th>
+            <td>{{originalText}}</td>
+            <td>{{field.name}}</td>
+            <td>{{score}}</td>
+            <td>{{maskingText}}</td>
+            <td>{{location.start}}, {{location.end}}, {{location.length}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<style>
+    table {
+        table-layout: fixed;
+        width: 100%;
+        text-align: center;
+    }
+
+    td {
+        width: 25%;
+    }
+</style>
