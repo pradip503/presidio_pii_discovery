@@ -9,33 +9,17 @@ module.exports = {
 
     analyzeProcess: async function () {
 
-        return new Promise(async (resolve, reject) => {
-            let findingsArray = [];
-
-            for (let i = 0; i < records.length; i++) {
-
-                let recordString = JSON.stringify(records[i]);
-
-                try {
-                    let filteredRecord = await analyzeAndMaskingProcess(recordString);
-                    findingsArray.push(...filteredRecord);
-
-                    if ((i) === (records.length - 1)) {
-                        resolve(findingsArray);
-                    }
-                } catch(error){
-                    console.log(error);
-                }
-
-            }
-        })
+        for (let i = 0; i < records.length; i++) {
+            let findings = await analyzeAndMaskingProcess(records[i])
+            return findings;
+        }
     },
 };
 
 
 //method to analyze the text
-function analyzeTextAPI(rawText) {
-    return axios.post(baseURL + '/projects/presidio/analyze', {
+async function analyzeTextAPI(rawText) {
+    return await axios.post(baseURL + '/projects/presidio/analyze', {
         text: rawText,
         analyzeTemplate: {
             allFields: true
@@ -45,38 +29,48 @@ function analyzeTextAPI(rawText) {
 
 
 //gets each records and analyze and mask it using detected data types
-function analyzeAndMaskingProcess(recordString) {
+async function analyzeAndMaskingProcess(eachRecord) {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
 
-        let newRecordedString = recordString;
-        analyzeTextAPI(recordString)
-            .then(results => {
-                let analyzerFindings = results ? results.data : null;
+        let eachKeys = Object.keys(eachRecord);
+        let finalizedArray = [];
+        let finalizedResolvedArray = [];
 
-                if (analyzerFindings) {
+        for (let i = 0; i < eachKeys.length; i++) {
+            finalizedArray.push(analyzeTextAPI(eachRecord[eachKeys[i]])
+                .then(async results => {
+                    let analyzerFindings = results ? results.data : null;
 
-                    let filteredFindings = analyzerFindings.filter(finding => finding.score >= 0.05);
-                    filteredFindings.map(filteredRecord => {
+                    if (analyzerFindings) {
 
-                        let locatedString = recordString.substring(filteredRecord.location.start, filteredRecord.location.end);
-                        filteredRecord['originalText'] = locatedString;
+                        let filteredFindings = analyzerFindings.filter(finding => finding.score >= 0.05);
 
-                        //replace original text with detected data types(masking)
-                        filteredRecord['maskingText'] = filteredRecord.field.name;
-                        newRecordedString = newRecordedString.replace(locatedString, filteredRecord.field.name);
+                        filteredFindings.map(filteredRecord => {
+                            let locatedString = eachRecord[eachKeys[i]].substring(filteredRecord.location.start, filteredRecord.location.end);
+                            filteredRecord['originalText'] = locatedString;
 
-                    });
+                            //replace original text with detected data types(masking)
+                            filteredRecord['maskingText'] = filteredRecord.field.name;
 
-                    console.log(newRecordedString);  //displays the masked string
-                    resolve(filteredFindings);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-                reject(0);
-            });
+                        });
 
+                        return (analyzerFindings);
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                    reject(0);
+                }));
+        }
+
+        const resolvedFinalArray = await Promise.all(finalizedArray);
+        resolvedFinalArray.forEach(finalArray => {
+            if (finalArray) {
+                finalizedResolvedArray.push(finalArray[0]);
+            }
+        });
+        resolve(finalizedResolvedArray);
     });
 }
 

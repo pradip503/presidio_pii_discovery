@@ -12,18 +12,27 @@ app.engine('handlebars', exphs());
 //get index route
 app.get('/', async function (req, res) {
 
-  analyzeProcess()
-    .then(response => {
-      if (response) {
-        res.render('findings', {
-          filteredData: response
-        });
-      } else {
-        res.render('findings');
-      }
-    })
-    .catch(error => console.log(error));
+  // analyzeProcess()
+  //   .then(response => {
+  //     if (response) {
+  //       res.render('findings', {
+  //         filteredData: response
+  //       });
+  //     } else {
+  //       res.render('findings');
+  //     }
+  //   })
+  //   .catch(error => console.log(error));
 
+  try {
+    let findings = await analyzeProcess();
+    res.render('findings', {
+      filteredData: findings
+    });
+  } catch (error) {
+    console.log(error);
+    res.render('findings');
+  }
 
 });
 

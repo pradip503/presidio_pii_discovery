@@ -9,12 +9,12 @@ module.exports = {
             "address": "10932 Bigge Rd",
             "city": "Menlo Park",
             "state": "CA",
-            "zip": 94025,
+            "zip": "94025",
             "phone": "408 496-7223",
             "email": "jwhite@domain.com",
             "cc_type": "m",
             "CCN": "5270-4267-6450-5516",
-            "cc_cvc": 123,
+            "cc_cvc": "123",
             "cc_expiredate": "6/25/2010"
         },
         {
@@ -27,12 +27,12 @@ module.exports = {
             "address": "10932 Bigge Rd",
             "city": "Menlo Park",
             "state": "CA",
-            "zip": 94025,
+            "zip": "94025",
             "phone": "408 496-7223",
             "email": "jwhite@domain.com",
             "cc_type": "m",
             "CCN": "5270-4267-6450-5516",
-            "cc_cvc": 123,
+            "cc_cvc": "123",
             "cc_expiredate": "6/25/2010"
         }
     ]
